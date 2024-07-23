@@ -302,6 +302,8 @@ func prepare(ctx *cli.Context) {
 
 	case ctx.IsSet(utils.HoodiFlag.Name):
 		log.Info("Starting Geth on Hoodi testnet...")
+	case ctx.IsSet(utils.EphemeryFlag.Name):
+		log.Info("Starting Geth on Ephemery testnet...")
 
 	case !ctx.IsSet(utils.NetworkIdFlag.Name):
 		log.Info("Starting Geth on Ethereum mainnet...")
@@ -309,7 +311,8 @@ func prepare(ctx *cli.Context) {
 	// If we're a full node on mainnet without --cache specified, bump default cache allowance
 	if !ctx.IsSet(utils.CacheFlag.Name) && !ctx.IsSet(utils.NetworkIdFlag.Name) {
 		// Make sure we're not on any supported preconfigured testnet either
-		if !ctx.IsSet(utils.HoleskyFlag.Name) &&
+		if !ctx.IsSet(utils.EphemeryFlag.Name) &&
+			!ctx.IsSet(utils.HoleskyFlag.Name) &&
 			!ctx.IsSet(utils.SepoliaFlag.Name) &&
 			!ctx.IsSet(utils.HoodiFlag.Name) &&
 			!ctx.IsSet(utils.DeveloperFlag.Name) {

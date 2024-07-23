@@ -37,6 +37,14 @@ var HoodiBootnodes = []string{
 	"enode://8ae4a48101b2299597341263da0deb47cc38aa4d3ef4b7430b897d49bfa10eb1ccfe1655679b1ed46928ef177fbf21b86837bd724400196c508427a6f41602cd@134.199.184.23:30303",
 }
 
+// EphemeryBootnodes are the enode URLs of the P2P bootstrap nodes running on the
+// Ephemery test network.
+var EphemeryBootnodes = []string{
+	// ephemery.dev bootnodes
+	"enode://50a54ecbd2175497640bcf46a25bbe9bb4fae51d7cc2a29ef4947a7ee17496cf39a699b7fe6b703ed0feb9dbaae7e44fc3827fcb7435ca9ac6de4daa4d983b3d@137.74.203.240:30303",
+	"enode://0f2c301a9a3f9fa2ccfa362b79552c052905d8c2982f707f46cd29ece5a9e1c14ecd06f4ac951b228f059a43c6284a1a14fce709e8976cac93b50345218bf2e9@135.181.140.168:30343",
+}
+
 // HoleskyBootnodes are the enode URLs of the P2P bootstrap nodes running on the
 // Holesky test network.
 var HoleskyBootnodes = []string{
