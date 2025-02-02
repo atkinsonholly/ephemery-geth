@@ -126,7 +126,7 @@ func (p *TxPool) reserver(id int, subpool SubPool) AddressReserver {
 				return ErrAlreadyReserved
 			}
 			p.reservations[addr] = subpool
-			if metrics.Enabled {
+			if metrics.Enabled() {
 				m := fmt.Sprintf("%s/%d", reservationsGaugeName, id)
 				metrics.GetOrRegisterGauge(m, nil).Inc(1)
 			}
@@ -143,7 +143,7 @@ func (p *TxPool) reserver(id int, subpool SubPool) AddressReserver {
 			return errors.New("address not owned")
 		}
 		delete(p.reservations, addr)
-		if metrics.Enabled {
+		if metrics.Enabled() {
 			m := fmt.Sprintf("%s/%d", reservationsGaugeName, id)
 			metrics.GetOrRegisterGauge(m, nil).Dec(1)
 		}
@@ -224,7 +224,10 @@ func (p *TxPool) loop(head *types.Header, chain BlockChain) {
 					for _, subpool := range p.subpools {
 						subpool.Reset(oldHead, newHead)
 					}
-					resetDone <- newHead
+					select {
+					case resetDone <- newHead:
+					case <-p.term:
+					}
 				}(oldHead, newHead)
 
 				// If the reset operation was explicitly requested, consider it

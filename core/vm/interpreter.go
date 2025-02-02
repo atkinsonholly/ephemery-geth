@@ -109,6 +109,8 @@ func NewEVMInterpreter(evm *EVM) *EVMInterpreter {
 	case evm.chainRules.IsVerkle:
 		// TODO replace with proper instruction set when fork is specified
 		table = &verkleInstructionSet
+	case evm.chainRules.IsPrague:
+		table = &pragueInstructionSet
 	case evm.chainRules.IsCancun:
 		table = &cancunInstructionSet
 	case evm.chainRules.IsShanghai:
@@ -231,7 +233,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			logged, pcCopy, gasCopy = false, pc, contract.Gas
 		}
 
-		if in.evm.chainRules.IsEIP4762 && !contract.IsDeployment {
+		if in.evm.chainRules.IsEIP4762 && !contract.IsDeployment && !contract.IsSystemCall {
 			// if the PC ends up in a new "chunk" of verkleized code, charge the
 			// associated costs.
 			contractAddr := contract.Address()

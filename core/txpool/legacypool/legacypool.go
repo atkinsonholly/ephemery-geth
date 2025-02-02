@@ -626,7 +626,7 @@ func (pool *LegacyPool) validateTxBasics(tx *types.Transaction, local bool) erro
 
 // validateTx checks whether a transaction is valid according to the consensus
 // rules and adheres to some heuristic limits of the local node (price and size).
-func (pool *LegacyPool) validateTx(tx *types.Transaction, local bool) error {
+func (pool *LegacyPool) validateTx(tx *types.Transaction) error {
 	opts := &txpool.ValidationOptionsWithState{
 		State: pool.currentState,
 
@@ -682,7 +682,7 @@ func (pool *LegacyPool) add(tx *types.Transaction, local bool) (replaced bool, e
 	isLocal := local || pool.locals.containsTx(tx)
 
 	// If the transaction fails basic validation, discard it
-	if err := pool.validateTx(tx, isLocal); err != nil {
+	if err := pool.validateTx(tx); err != nil {
 		log.Trace("Discarding invalid transaction", "hash", hash, "err", err)
 		invalidTxMeter.Mark(1)
 		return false, err
@@ -1440,7 +1440,7 @@ func (pool *LegacyPool) reset(oldHead, newHead *types.Header) {
 
 	// Inject any transactions discarded due to reorgs
 	log.Debug("Reinjecting stale transactions", "count", len(reinject))
-	core.SenderCacher.Recover(pool.signer, reinject)
+	core.SenderCacher().Recover(pool.signer, reinject)
 	pool.addTxsLocked(reinject, false)
 }
 
@@ -1986,7 +1986,7 @@ func (pool *LegacyPool) Clear() {
 		senderAddr, _ := types.Sender(pool.signer, tx)
 		pool.reserve(senderAddr, false)
 	}
-	for localSender, _ := range pool.locals.accounts {
+	for localSender := range pool.locals.accounts {
 		pool.reserve(localSender, false)
 	}
 
@@ -1994,6 +1994,7 @@ func (pool *LegacyPool) Clear() {
 	pool.priced = newPricedList(pool.all)
 	pool.pending = make(map[common.Address]*list)
 	pool.queue = make(map[common.Address]*list)
+	pool.pendingNonces = newNoncer(pool.currentState)
 
 	if !pool.config.NoLocals && pool.config.Journal != "" {
 		pool.journal = newTxJournal(pool.config.Journal)
