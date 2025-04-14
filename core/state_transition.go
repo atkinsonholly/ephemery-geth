@@ -423,7 +423,6 @@ func (st *stateTransition) execute() (*ExecutionResult, error) {
 
 	var (
 		msg              = st.msg
-		sender           = vm.AccountRef(msg.From)
 		rules            = st.evm.ChainConfig().Rules(st.evm.Context.BlockNumber, st.evm.Context.Random != nil, st.evm.Context.Time)
 		contractCreation = msg.To == nil
 		floorDataGas     uint64
@@ -484,10 +483,10 @@ func (st *stateTransition) execute() (*ExecutionResult, error) {
 		vmerr error // vm errors do not effect consensus and are therefore not assigned to err
 	)
 	if contractCreation {
-		ret, _, st.gasRemaining, vmerr = st.evm.Create(sender, msg.Data, st.gasRemaining, value)
+		ret, _, st.gasRemaining, vmerr = st.evm.Create(msg.From, msg.Data, st.gasRemaining, value)
 	} else {
 		// Increment the nonce for the next transaction.
-		st.state.SetNonce(msg.From, st.state.GetNonce(msg.From)+1)
+		st.state.SetNonce(msg.From, st.state.GetNonce(msg.From)+1, tracing.NonceChangeEoACall)
 
 		// Apply EIP-7702 authorizations.
 		if msg.SetCodeAuthorizations != nil {
@@ -507,7 +506,7 @@ func (st *stateTransition) execute() (*ExecutionResult, error) {
 		}
 
 		// Execute the transaction's call.
-		ret, st.gasRemaining, vmerr = st.evm.Call(sender, st.to(), msg.Data, st.gasRemaining, value)
+		ret, st.gasRemaining, vmerr = st.evm.Call(msg.From, st.to(), msg.Data, st.gasRemaining, value)
 	}
 
 	// Compute refund counter, capped to a refund quotient.
@@ -602,7 +601,7 @@ func (st *stateTransition) applyAuthorization(auth *types.SetCodeAuthorization) 
 	}
 
 	// Update nonce and account code.
-	st.state.SetNonce(authority, auth.Nonce+1)
+	st.state.SetNonce(authority, auth.Nonce+1, tracing.NonceChangeAuthorization)
 	if auth.Address == (common.Address{}) {
 		// Delegation to zero address means clear.
 		st.state.SetCode(authority, nil)

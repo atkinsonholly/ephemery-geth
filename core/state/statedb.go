@@ -432,7 +432,7 @@ func (s *StateDB) SetBalance(addr common.Address, amount *uint256.Int, reason tr
 	}
 }
 
-func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
+func (s *StateDB) SetNonce(addr common.Address, nonce uint64, reason tracing.NonceChangeReason) {
 	stateObject := s.getOrNewStateObject(addr)
 	if stateObject != nil {
 		stateObject.SetNonce(nonce)
@@ -600,7 +600,6 @@ func (s *StateDB) getStateObject(addr common.Address) *stateObject {
 	// Insert into the live set
 	obj := newObject(s, addr, acct)
 	s.setStateObject(obj)
-	s.AccountLoaded++
 	return obj
 }
 
