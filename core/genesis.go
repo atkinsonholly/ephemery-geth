@@ -634,7 +634,18 @@ func DefaultHoleskyGenesisBlock() *Genesis {
 	}
 }
 
-<<<<<<< HEAD
+// DefaultHoodiGenesisBlock returns the Hoodi network genesis block.
+func DefaultHoodiGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.HoodiChainConfig,
+		Nonce:      0x1234,
+		GasLimit:   0x2255100,
+		Difficulty: big.NewInt(0x01),
+		Timestamp:  1742212800,
+		Alloc:      decodePrealloc(hoodiAllocData),
+	}
+}
+
 // DefaultEphemeryGenesisBlock returns the Ephemery network genesis block.
 func DefaultEphemeryGenesisBlock() *Genesis {
 	// Calculate the number of ephemery iterations that have elapsed since minGenesisTime to get the latest ChainID
@@ -661,17 +672,6 @@ func DefaultEphemeryGenesisBlock() *Genesis {
 		Timestamp:  (params.EphemeryChainConfig.GenesisInterval * uint64(iteration)) + uint64(minGenesisTimestamp) + genesisDelay,
 		ExtraData:  []byte(""),
 		Alloc:      decodePrealloc(ephemeryAllocData),
-=======
-// DefaultHoodiGenesisBlock returns the Hoodi network genesis block.
-func DefaultHoodiGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.HoodiChainConfig,
-		Nonce:      0x1234,
-		GasLimit:   0x2255100,
-		Difficulty: big.NewInt(0x01),
-		Timestamp:  1742212800,
-		Alloc:      decodePrealloc(hoodiAllocData),
->>>>>>> ecd5c18610c5276e7c6c34d2f317cf774441a81c
 	}
 }
 
