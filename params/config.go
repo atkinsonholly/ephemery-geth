@@ -91,6 +91,10 @@ var (
 		CancunTime:              newUint64(1707305664),
 		Ethash:                  new(EthashConfig),
 		GenesisInterval:         uint64(2419200), // 4 weeks in seconds
+		BlobScheduleConfig: &BlobScheduleConfig{
+			Cancun: DefaultCancunBlobConfig,
+			Prague: DefaultPragueBlobConfig,
+		},
 	}
 	// HoleskyChainConfig contains the chain parameters to run a node on the Holesky test network.
 	HoleskyChainConfig = &ChainConfig{
