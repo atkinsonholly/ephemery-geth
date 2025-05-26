@@ -434,6 +434,7 @@ func DeleteBlockLvPointers(db ethdb.KeyValueStore, blocks common.Range[uint64], 
 // FilterMapsRange is a storage representation of the block range covered by the
 // filter maps structure and the corresponting log value index range.
 type FilterMapsRange struct {
+	Version                      uint32
 	HeadIndexed                  bool
 	HeadDelimiter                uint64
 	BlocksFirst, BlocksAfterLast uint64
@@ -445,7 +446,7 @@ type FilterMapsRange struct {
 // database entry is not present, that is interpreted as a valid non-initialized
 // state and returns a blank range structure and no error.
 func ReadFilterMapsRange(db ethdb.KeyValueReader) (FilterMapsRange, bool, error) {
-	if has, err := db.Has(filterMapsRangeKey); !has || err != nil {
+	if has, err := db.Has(filterMapsRangeKey); err != nil || !has {
 		return FilterMapsRange{}, false, err
 	}
 	encRange, err := db.Get(filterMapsRangeKey)
@@ -456,7 +457,8 @@ func ReadFilterMapsRange(db ethdb.KeyValueReader) (FilterMapsRange, bool, error)
 	if err := rlp.DecodeBytes(encRange, &fmRange); err != nil {
 		return FilterMapsRange{}, false, err
 	}
-	return fmRange, true, err
+
+	return fmRange, true, nil
 }
 
 // WriteFilterMapsRange stores the filter maps range data.
