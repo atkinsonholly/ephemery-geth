@@ -95,8 +95,9 @@ var (
 		GrayGlacierBlock:        nil,
 		TerminalTotalDifficulty: big.NewInt(0),
 		MergeNetsplitBlock:      nil,
-		ShanghaiTime:            newUint64(1696000704),
-		CancunTime:              newUint64(1707305664),
+		ShanghaiTime:            newUint64(0),
+		CancunTime:              newUint64(0),
+		PragueTime:              newUint64(0),
 		Ethash:                  new(EthashConfig),
 		GenesisInterval:         uint64(2419200), // 4 weeks in seconds
 		BlobScheduleConfig: &BlobScheduleConfig{

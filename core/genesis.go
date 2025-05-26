@@ -683,12 +683,47 @@ func DefaultEphemeryGenesisBlock() *Genesis {
 	return &Genesis{
 		Config:     params.EphemeryChainConfig,
 		Nonce:      0x1234,
-		GasLimit:   0x400000,
+		GasLimit:   0x2255100,
 		Difficulty: big.NewInt(0x01),
 		Timestamp:  (params.EphemeryChainConfig.GenesisInterval * uint64(iteration)) + uint64(minGenesisTimestamp) + genesisDelay,
 		ExtraData:  []byte(""),
 		Alloc:      decodePrealloc(ephemeryAllocData),
 	}
+}
+
+// decodePrealloc decodes the genesis account allocations.
+func decodePrealloc(data string) types.GenesisAlloc {
+	type accountData struct {
+		Addr    *big.Int
+		Balance *big.Int
+		Misc    *struct {
+			Nonce uint64
+			Code  []byte
+			Slots []struct {
+				Key common.Hash
+				Val common.Hash
+			}
+		} `rlp:"optional"`
+	}
+	var p []accountData
+	if err := rlp.NewStream(strings.NewReader(data), 0).Decode(&p); err != nil {
+		panic(err)
+	}
+	ga := make(types.GenesisAlloc, len(p))
+	for _, account := range p {
+		acc := types.Account{Balance: account.Balance}
+		if account.Misc != nil {
+			acc.Nonce = account.Misc.Nonce
+			acc.Code = account.Misc.Code
+
+			acc.Storage = make(map[common.Hash]common.Hash)
+			for _, slot := range account.Misc.Slots {
+				acc.Storage[slot.Key] = slot.Val
+			}
+		}
+		ga[common.BigToAddress(account.Addr)] = acc
+	}
+	return ga
 }
 
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block.
@@ -732,37 +767,4 @@ func DeveloperGenesisBlock(gasLimit uint64, faucet *common.Address) *Genesis {
 		genesis.Alloc[*faucet] = types.Account{Balance: new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(9))}
 	}
 	return genesis
-}
-
-func decodePrealloc(data string) types.GenesisAlloc {
-	var p []struct {
-		Addr    *big.Int
-		Balance *big.Int
-		Misc    *struct {
-			Nonce uint64
-			Code  []byte
-			Slots []struct {
-				Key common.Hash
-				Val common.Hash
-			}
-		} `rlp:"optional"`
-	}
-	if err := rlp.NewStream(strings.NewReader(data), 0).Decode(&p); err != nil {
-		panic(err)
-	}
-	ga := make(types.GenesisAlloc, len(p))
-	for _, account := range p {
-		acc := types.Account{Balance: account.Balance}
-		if account.Misc != nil {
-			acc.Nonce = account.Misc.Nonce
-			acc.Code = account.Misc.Code
-
-			acc.Storage = make(map[common.Hash]common.Hash)
-			for _, slot := range account.Misc.Slots {
-				acc.Storage[slot.Key] = slot.Val
-			}
-		}
-		ga[common.BigToAddress(account.Addr)] = acc
-	}
-	return ga
 }
