@@ -159,6 +159,8 @@ var (
 	HoodiFlag = &cli.BoolFlag{
 		Name:     "hoodi",
 		Usage:    "Hoodi network: pre-configured proof-of-stake test network",
+		Category: flags.EthCategory,
+	}
 	EphemeryFlag = &cli.BoolFlag{
 		Name:     "ephemery",
 		Usage:    "Ephemery network: pre-configured proof-of-stake test network",
@@ -1060,6 +1062,7 @@ func MakeDataDir(ctx *cli.Context) string {
 		}
 		if ctx.Bool(HoodiFlag.Name) {
 			return filepath.Join(path, "hoodi")
+		}
 		if ctx.Bool(EphemeryFlag.Name) {
 			return filepath.Join(path, "ephemery")
 		}
