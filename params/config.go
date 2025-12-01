@@ -32,6 +32,7 @@ var (
 	HoleskyGenesisHash = common.HexToHash("0xb5f7f912443c940f21fd611f12828d75b534364ed9e95ca4e307729a4661bde4")
 	SepoliaGenesisHash = common.HexToHash("0x25a5cc106eea7138acab33231d7160d69cb777ee0c2c553fcddf5138993e6dd9")
 	HoodiGenesisHash   = common.HexToHash("0xbbe312868b376a3001692a646dd2d7d1e4406380dfd86b98aa8a34d1557c971b")
+	EphemeryGenesisHash = common.HexToHash("0xb62368598318c23ba82921969086f7ab078cad039d84f5cf557812a921535c46")
 )
 
 func newUint64(val uint64) *uint64 { return &val }
@@ -180,6 +181,36 @@ var (
 			Osaka:  DefaultOsakaBlobConfig,
 			BPO1:   DefaultBPO1BlobConfig,
 			BPO2:   DefaultBPO2BlobConfig,
+		},
+	}
+	// EphemeryChainConfig contains the chain parameters to run a node on the Ephemery test network.
+	EphemeryChainConfig = &ChainConfig{
+		ChainID:                 big.NewInt(39438000),
+		HomesteadBlock:          big.NewInt(0),
+		DAOForkBlock:            nil,
+		DAOForkSupport:          true,
+		EIP150Block:             big.NewInt(0),
+		EIP155Block:             big.NewInt(0),
+		EIP158Block:             big.NewInt(0),
+		ByzantiumBlock:          big.NewInt(0),
+		ConstantinopleBlock:     big.NewInt(0),
+		PetersburgBlock:         big.NewInt(0),
+		IstanbulBlock:           big.NewInt(0),
+		MuirGlacierBlock:        nil,
+		BerlinBlock:             big.NewInt(0),
+		LondonBlock:             big.NewInt(0),
+		ArrowGlacierBlock:       nil,
+		GrayGlacierBlock:        nil,
+		TerminalTotalDifficulty: big.NewInt(0),
+		MergeNetsplitBlock:      nil,
+		ShanghaiTime:            newUint64(0),
+		CancunTime:              newUint64(0),
+		PragueTime:              newUint64(0),
+		Ethash:                  new(EthashConfig),
+		GenesisInterval:         uint64(2419200), // 4 weeks in seconds
+		BlobScheduleConfig: &BlobScheduleConfig{
+			Cancun: DefaultCancunBlobConfig,
+			Prague: DefaultPragueBlobConfig,
 		},
 	}
 	// AllEthashProtocolChanges contains every protocol change (EIPs) introduced
@@ -423,6 +454,7 @@ var NetworkNames = map[string]string{
 	SepoliaChainConfig.ChainID.String(): "sepolia",
 	HoleskyChainConfig.ChainID.String(): "holesky",
 	HoodiChainConfig.ChainID.String():   "hoodi",
+	EphemeryChainConfig.ChainID.String(): "ephemery",
 }
 
 // ChainConfig is the core config which determines the blockchain settings.
@@ -491,6 +523,10 @@ type ChainConfig struct {
 	Ethash             *EthashConfig       `json:"ethash,omitempty"`
 	Clique             *CliqueConfig       `json:"clique,omitempty"`
 	BlobScheduleConfig *BlobScheduleConfig `json:"blobSchedule,omitempty"`
+	// EphemeralTime is a flag that is added to support the Ephemery network
+	// GenesisInterval is a flag that is added to support the Ephemery network
+	// EIP-6916 implements the Ephemery testnet (https://github.com/ethereum/EIPs/blob/master/EIPS/eip-6916.md)
+	GenesisInterval uint64 `json:"ephemeralTime"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
